@@ -195,24 +195,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
     <script>
-        // Browser Check (Enforce Safari for local files)
-        const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
-        const isSafari = navigator.userAgent.indexOf('Safari') > -1 && !isChrome;
+       
+  // Browser Check — only require Safari for local file:// access.
+  // Over https (e.g. GitHub Pages) Chrome/Edge/Firefox all allow camera access.
+  const isChrome = navigator.userAgent.indexOf('Chrome') > -1;
+  const isSafari = navigator.userAgent.indexOf('Safari') > -1 && !isChrome;
+  const isLocalFile = location.protocol === 'file:';
 
-        if (!isSafari) {
-            document.body.innerHTML = `
-                <div style="display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; padding: 20px; background-color: #111;">
-                    <div>
-                        <h1 style="color:#ef4444; font-size:2.5rem; margin-bottom:10px;">Safari Required</h1>
-                        <p style="font-size:1.2rem; max-width: 600px; line-height: 1.5; color:#cbd5e1;">
-                            Google Chrome and other browsers block Augmented Reality camera access when running local files directly from your computer.<br><br>
-                            To use MoleculeMotion AR, please double-click and open this file using <b>Apple Safari</b>.
-                        </p>
-                    </div>
-                </div>
-            `;
-            throw new Error("Browser is not Safari. Execution stopped.");
-        }
+  if (isLocalFile && !isSafari) {
+      document.body.innerHTML = `
+          <div style="display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; padding: 20px; background-color: #111;">
+              <div>
+                  <h1 style="color:#ef4444; font-size:2.5rem; margin-bottom:10px;">Safari Required for Local Files</h1>
+                  <p style="font-size:1.2rem; max-width: 600px; line-height: 1.5; color:#cbd5e1;">
+                      Browsers block camera access on local files (<code>file://</code>). To run this locally, open it with <b>Apple Safari</b>.<br><br>
+                      If you're viewing this on a hosted site (https), just use your normal browser.
+                  </p>
+              </div>
+          </div>
+      `;
+      throw new Error("Local file requires Safari. Serve over https or use Safari.");
+  }
+
 
         // Data
         const molecules = {
